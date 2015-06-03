@@ -60,6 +60,7 @@ int main(void){
     if(write <= 17){
       fprintf(fp1,"%s",dict[i]);
     }
+    free(dict[i]);
   }
   
 }
