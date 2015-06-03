@@ -1,0 +1,80 @@
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+
+#define BUFSIZE 16
+
+int main(int argc, char* argv[]){
+  
+  FILE *fp;
+  int compare[26]; // 辞書の単語の頻出度
+  int base[26]; // 入力した16文字の頻出度
+  int i, check, len;
+  int breakflag = 0;
+  char c;
+  char enter[BUFSIZE+1], dict[BUFSIZE+2]; //enter: 入力した16文字 dict: 辞書用
+
+  check = strlen(argv[1]);
+  
+  if(check != 16){
+    fprintf(stderr,"Error: please enter 16 character\n");
+    exit(EXIT_FAILURE);
+  }
+  
+  strncpy(enter, argv[1], BUFSIZE+1); // enterに最初の16文字をコピー
+
+  for(i=0; i<26; i++){
+    compare[i]=0;
+    base[i]=0;
+  }
+
+  for(i=0; i<26; i++){
+    c = enter[i];
+    if(c-97 >= 0){
+      base[c-97] += 1;
+    }else{
+      base[c-65] += 1;
+    } //if
+  }
+
+  if((fp = fopen("sortdict.csv","r")) == NULL){
+    fprintf(stderr,"Error: fail to make file");
+    exit(EXIT_FAILURE);
+  }
+  
+  while(fgets(dict, BUFSIZE+2, fp) != NULL){
+
+    len = strlen(dict);
+    // printf("%s",dict);
+
+    for(i=0; i<len-1; i++){
+      c = dict[i];
+      if(c-97 >= 0){
+	compare[c-97] += 1;
+	if(compare[c-97] > base[c-97]){
+	  breakflag = -1;
+	  break; //forから
+	}
+      }else{
+	compare[c-65] += 1;
+	if(compare[c-65] > base[c-65]){
+	  breakflag = -1;
+	  break; //forから
+	}
+      }// if
+    }//for
+
+    if(breakflag == 0){
+      break; //whileから
+    }
+    breakflag = 0;
+    
+    for(i=0; i<26; i++){
+      compare[i]=0;
+    }
+
+  }//while
+
+  printf("longest word: %s",dict);
+
+}
